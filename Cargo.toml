@@ -2,5 +2,22 @@
 name = "candle-lstm"
 version = "0.1.0"
 edition = "2021"
+description = "optimize HuggingFace candle LSTM in some cases"
+readme = "README.md"
+repository = "https://github.com/kigichang/candle-lstm"
+license-file = "LICENSE"
+keywords = ["candle", "lstm", "pytorch"]
 
 [dependencies]
+accelerate-src = { version = "0.3.2", optional = true }
+candle-core = "0.6.0"
+candle-nn = "0.6.0"
+intel-mkl-src = { version = "0.8.1", optional = true }
+
+[dev-dependencies]
+anyhow = "1.0.86"
+
+[features]
+default = []
+accelerate = ["dep:accelerate-src", "candle-core/accelerate", "candle-nn/accelerate"]
+mkl = ["dep:intel-mkl-src", "candle-core/mkl", "candle-nn/mkl"]
