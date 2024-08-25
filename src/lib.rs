@@ -345,7 +345,7 @@ impl BiLSTM {
     pub fn forward(
         &self,
         input: &Tensor,
-        init_state: Option<(&LSTMState, &LSTMState)>,
+        init_state: Option<&(LSTMState, LSTMState)>,
     ) -> Result<Vec<(LSTMState, LSTMState)>> {
         let (d1, d2, _features) = input.dims3()?;
         let (seq_len, batch_szie) = if self.config.batch_first {
@@ -569,10 +569,10 @@ mod tests {
 
         let f_init_state = LSTMState::zero(BATCH_SIZE, HIDDEN_DIM, input.dtype(), input.device())?;
         let b_init_state = f_init_state.clone();
-        let init_state = Some((&f_init_state, &b_init_state));
+        let init_state = Some((f_init_state, b_init_state));
 
         let start = std::time::Instant::now();
-        let states = bilstm.forward(&input, init_state)?;
+        let states = bilstm.forward(&input, init_state.as_ref())?;
         let result = bilstm.states_to_tensor(&states)?;
         let elapsed = start.elapsed();
         println!("fast bilstm elapsed: {:?}", elapsed.as_secs_f32());
