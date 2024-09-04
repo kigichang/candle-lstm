@@ -451,7 +451,7 @@ impl BiLSTM {
 mod tests {
     use super::*;
     use anyhow::{Ok, Result};
-    use candle_core::{Tensor, D};
+    use candle_core::{utils, Tensor, D};
     use candle_nn::RNN;
 
     const IN_DIM: usize = 768;
@@ -472,16 +472,34 @@ mod tests {
         Ok(())
     }
 
+    fn use_gpu(gpu: bool) -> Device {
+        if gpu {
+            if utils::cuda_is_available() {
+                println!("CUDA is available.");
+                Device::new_cuda(0).unwrap()
+            } else if utils::metal_is_available() {
+                println!("Metal is available.");
+                Device::new_metal(0).unwrap()
+            } else {
+                Device::Cpu
+            }
+        } else {
+            Device::Cpu
+        }
+    }
+
     #[test]
     fn load_lstm() -> Result<()> {
-        let vb = VarBuilder::from_pth("lstm_test.pt", DType::F32, &Device::Cpu)?;
+        let device = use_gpu(true);
+        let vb = VarBuilder::from_pth("lstm_test.pt", DType::F32, &device)?;
         lstm(IN_DIM, HIDDEN_DIM, LSTMConfig::default(), vb)?;
         Ok(())
     }
 
     #[test]
     fn test_lstm() -> Result<()> {
-        let vb = VarBuilder::from_pth("lstm_test.pt", DType::F32, &Device::Cpu)?;
+        let device = use_gpu(true);
+        let vb = VarBuilder::from_pth("lstm_test.pt", DType::F32, &device)?;
         let lstm = lstm(IN_DIM, HIDDEN_DIM, LSTMConfig::default(), vb.clone())?;
 
         let input = vb.get((SEQ_LEN, BATCH_SIZE, IN_DIM), "input")?;
@@ -491,7 +509,7 @@ mod tests {
         let states = lstm.forward(&input, None)?;
         let result = lstm.states_to_tensor(&states)?;
         let elapsed = start.elapsed();
-        println!("fast lstm elapsed: {:?}", elapsed.as_secs_f32());
+        println!("my lstm elapsed: {:?}", elapsed.as_secs_f32());
 
         assert_tensor(&result, &output, 3, 1e-5)?;
 
@@ -517,10 +535,11 @@ mod tests {
 
     #[test]
     fn test_batch_first_lstm() -> Result<()> {
+        let device = use_gpu(true);
         let mut config = LSTMConfig::default();
         config.batch_first = true;
 
-        let vb = VarBuilder::from_pth("lstm_test_batch_first.pt", DType::F32, &Device::Cpu)?;
+        let vb = VarBuilder::from_pth("lstm_test_batch_first.pt", DType::F32, &device)?;
         let lstm = lstm(IN_DIM, HIDDEN_DIM, config, vb.clone())?;
 
         let input = vb.get((BATCH_SIZE, SEQ_LEN, IN_DIM), "input")?;
@@ -530,7 +549,7 @@ mod tests {
         let states = lstm.forward(&input, None)?;
         let result = lstm.states_to_tensor(&states)?;
         let elapsed = start.elapsed();
-        println!("fast lstm elapsed: {:?}", elapsed.as_secs_f32());
+        println!("my lstm elapsed: {:?}", elapsed.as_secs_f32());
 
         assert_tensor(&result, &output, 3, 1e-5)?;
 
@@ -554,14 +573,16 @@ mod tests {
 
     #[test]
     fn load_bilstm() -> Result<()> {
-        let vb = VarBuilder::from_pth("bi_lstm_test.pt", DType::F32, &Device::Cpu)?;
+        let device = use_gpu(true);
+        let vb = VarBuilder::from_pth("bi_lstm_test.pt", DType::F32, &device)?;
         bilstm(IN_DIM, HIDDEN_DIM, LSTMConfig::default(), vb)?;
         Ok(())
     }
 
     #[test]
     fn test_bilstm() -> Result<()> {
-        let vb = VarBuilder::from_pth("bi_lstm_test.pt", DType::F32, &Device::Cpu)?;
+        let device = use_gpu(true);
+        let vb = VarBuilder::from_pth("bi_lstm_test.pt", DType::F32, &device)?;
         let bilstm = bilstm(IN_DIM, HIDDEN_DIM, LSTMConfig::default(), vb.clone())?;
 
         let input = vb.get((SEQ_LEN, BATCH_SIZE, IN_DIM), "input")?;
@@ -575,7 +596,7 @@ mod tests {
         let states = bilstm.forward(&input, init_state.as_ref())?;
         let result = bilstm.states_to_tensor(&states)?;
         let elapsed = start.elapsed();
-        println!("fast bilstm elapsed: {:?}", elapsed.as_secs_f32());
+        println!("my bilstm elapsed: {:?}", elapsed.as_secs_f32());
 
         assert_tensor(&result, &output, 3, 1e-5)?;
 
@@ -584,10 +605,11 @@ mod tests {
 
     #[test]
     fn test_batch_first_bilstm() -> Result<()> {
+        let device = use_gpu(true);
         let mut config = LSTMConfig::default();
         config.batch_first = true;
 
-        let vb = VarBuilder::from_pth("bi_lstm_test_batch_first.pt", DType::F32, &Device::Cpu)?;
+        let vb = VarBuilder::from_pth("bi_lstm_test_batch_first.pt", DType::F32, &device)?;
         let bilstm = bilstm(IN_DIM, HIDDEN_DIM, config, vb.clone())?;
 
         let input = vb.get((BATCH_SIZE, SEQ_LEN, IN_DIM), "input")?;
@@ -597,7 +619,7 @@ mod tests {
         let states = bilstm.forward(&input, None)?;
         let result = bilstm.states_to_tensor(&states)?;
         let elapsed = start.elapsed();
-        println!("fast bilstm elapsed: {:?}", elapsed.as_secs_f32());
+        println!("my bilstm elapsed: {:?}", elapsed.as_secs_f32());
 
         assert_tensor(&result, &output, 3, 1e-5)?;
 

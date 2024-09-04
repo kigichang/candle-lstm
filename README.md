@@ -2,6 +2,10 @@
 
 Re-implementing Candle LSTM inference to speed inference up, including bidirectional LSTM.
 
+## CPU Only
+
+My LSTM implementation sppeds up inference on CPU ONLY. It is not optimized for GPU.
+
 ## Test Data
 
 Install Pytorch and run simple.py to generate test data.
