@@ -2,9 +2,11 @@
 
 Re-implementing Candle LSTM inference to speed inference up, including bidirectional LSTM.
 
-## CPU Only
+## CPU And GPU Inference
 
-My LSTM implementation sppeds up inference on CPU ONLY. It is not optimized for GPU.
+I test inference on My Macbook Pro with M2 chip and on Metal GPU (see test cases). My LSTM implementation sppeds up inference on CPU ONLY. It is not optimized on Metal. It is ~5ms slower than Candle on Metal.
+
+I have no Cuda platform, so I cannot verify it on Cuda.
 
 ## Test Data
 
