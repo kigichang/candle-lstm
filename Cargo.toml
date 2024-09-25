@@ -1,6 +1,6 @@
 [package]
 name = "candle-lstm"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 description = "optimize HuggingFace candle LSTM in some cases"
 readme = "README.md"
@@ -9,17 +9,17 @@ license-file = "LICENSE"
 keywords = ["candle", "lstm", "pytorch"]
 
 [dependencies]
-candle-core = "0.6.0"
-candle-nn = "0.6.0"
+candle-core = "0.7.0"
+candle-nn = "0.7.0"
 
 [dev-dependencies]
 anyhow = "1.0.86"
 
 [target.'cfg(target_os = "macos")'.dev-dependencies]
-candle-core = {version = "0.6.0", features = ["accelerate", "metal"]}
-candle-nn = {version = "0.6.0", features = ["accelerate", "metal"]}
+candle-core = {version = "0.7.0", features = ["accelerate", "metal"]}
+candle-nn = {version = "0.7.0", features = ["accelerate", "metal"]}
 
 [target.'cfg(not(target_os = "macos"))'.dev-dependencies]
-candle-core = {version = "0.6.0", features = ["mkl", "cuda"]}
-candle-nn = {version = "0.6.0", features = ["mkl", "cuda"]}
+candle-core = {version = "0.7.0", features = ["mkl", "cuda"]}
+candle-nn = {version = "0.7.0", features = ["mkl", "cuda"]}
 
